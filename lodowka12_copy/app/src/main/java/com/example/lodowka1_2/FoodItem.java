@@ -19,13 +19,10 @@ public class FoodItem implements Serializable {
     public Calendar getExpiryDate() {
         return expiryDate;
     }
-    
 
     @Override
     public String toString() {
-        // Zwraca nazwę przedmiotu i datę w formacie "dd/MM/yyyy"
-        return name + " - " + expiryDate.get(Calendar.DAY_OF_MONTH) + "/" +
-                (expiryDate.get(Calendar.MONTH) + 1) + "/" +
-                expiryDate.get(Calendar.YEAR);
+        return name + " (" + expiryDate.get(Calendar.DAY_OF_MONTH) + "/" +
+                (expiryDate.get(Calendar.MONTH) + 1) + "/" + expiryDate.get(Calendar.YEAR) + ")";
     }
 }
