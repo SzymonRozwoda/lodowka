@@ -42,8 +42,9 @@ public class NotificationHelper {
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
-                    CHANNEL_ID, "Powiadomienia o ważności", NotificationManager.IMPORTANCE_DEFAULT
+                    CHANNEL_ID, "Powiadomienia o ważności", NotificationManager.IMPORTANCE_HIGH
             );
+            channel.setDescription("Powiadomienia o kończącej się dacie ważności produktów.");
             manager.createNotificationChannel(channel);
         }
 
@@ -53,11 +54,13 @@ public class NotificationHelper {
         );
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.lodowka)
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setAutoCancel(true);
 
         manager.notify(1, builder.build());
