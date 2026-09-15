@@ -6,17 +6,29 @@
     android:padding="16dp">
 
     <Button
-        android:id="@+id/testNotificationBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Testuj powiadomienie" />
-
-
-    <Button
         android:id="@+id/addButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Dodaj produkt" />
+        android:text="Dodaj produkt do lodówki" />
+
+    <TextView
+        android:id="@+id/alarmStatusText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Status alarmu"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"
+        android:textColor="#FF0000"
+        android:gravity="center"
+        android:textStyle="italic" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Twoje produkty:"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"
+        android:textStyle="bold" />
 
     <ListView
         android:id="@+id/listViewFoodItems"
