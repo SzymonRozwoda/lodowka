@@ -24,10 +24,6 @@
 # Gradle
 .gradle/
 /buildSrc/build/
-/gradlew.bat
-/gradlew
-/gradle/wrapper/gradle-wrapper.properties
-/gradle/wrapper/gradle-wrapper.jar
 
 # Log files
 *.log
