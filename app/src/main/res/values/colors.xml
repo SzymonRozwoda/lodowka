@@ -2,4 +2,20 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Green Theme Colors -->
+    <color name="green_primary">#2E7D32</color>
+    <color name="green_on_primary">#FFFFFF</color>
+    <color name="green_primary_container">#A5D6A7</color>
+    <color name="green_on_primary_container">#002107</color>
+
+    <color name="green_secondary">#526350</color>
+    <color name="green_on_secondary">#FFFFFF</color>
+    <color name="green_secondary_container">#D5E8D0</color>
+    <color name="green_on_secondary_container">#111F0F</color>
+
+    <color name="green_dark_primary">#81C784</color>
+    <color name="green_dark_on_primary">#00390A</color>
+    <color name="green_dark_primary_container">#1B5E20</color>
+    <color name="green_dark_on_primary_container">#C8E6C9</color>
 </resources>

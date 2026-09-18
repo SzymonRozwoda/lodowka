@@ -18,6 +18,17 @@ public class StorageHelper {
         }
     }
 
+    public static void saveAllFoodItems(Context context, ArrayList<FoodItem> items, String filename) {
+        try (FileOutputStream fos = context.openFileOutput(filename, Context.MODE_PRIVATE);
+             OutputStreamWriter writer = new OutputStreamWriter(fos)) {
+            for (FoodItem item : items) {
+                writer.write(item.getName() + ";" + item.getExpiryDate().getTimeInMillis() + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static ArrayList<FoodItem> loadFoodItems(Context context, String filename) {
         ArrayList<FoodItem> items = new ArrayList<>();
         try (FileInputStream fis = context.openFileInput(filename);
