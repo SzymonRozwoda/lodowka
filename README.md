@@ -1,4 +1,4 @@
-# 🍏 Lodówka - Twój osobisty asystent dat ważności
+# 🐸 Lodówka - Twój osobisty asystent dat ważności
 
 Aplikacja mobilna na system Android, która pomaga zarządzać produktami spożywczymi. "Lodówka" pilnuje terminów ważności za Ciebie i przypomina o nich o wybranej przez Ciebie porze.
 
