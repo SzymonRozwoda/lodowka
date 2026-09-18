@@ -1,39 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/addButton"
+    <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/alarmStatusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:paddingBottom="4dp"
+            android:text="Status alarmu"
+            android:textColor="#FF0000"
+            android:textStyle="italic" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:paddingBottom="4dp"
+            android:text="Twoje produkty:"
+            android:textStyle="bold" />
+
+        <ListView
+            android:id="@+id/listViewFoodItems"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+    <!-- Kontener na wysuwane opcje -->
+    <LinearLayout
+        android:id="@+id/fab_menu_container"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Dodaj produkt do lodówki" />
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="80dp"
+        android:gravity="end"
+        android:orientation="vertical"
+        android:visibility="gone">
 
-    <TextView
-        android:id="@+id/alarmStatusText"
-        android:layout_width="match_parent"
+        <!-- Opcja Ustawienia -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ustawienia"
+                android:layout_marginEnd="8dp"
+                android:background="@android:color/white"
+                android:padding="4dp"
+                android:elevation="4dp"/>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:fabSize="mini"
+                app:srcCompat="@android:drawable/ic_menu_manage" />
+        </LinearLayout>
+
+        <!-- Opcja Dodaj -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dodaj produkt"
+                android:layout_marginEnd="8dp"
+                android:background="@android:color/white"
+                android:padding="4dp"
+                android:elevation="4dp"/>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_add_item"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:fabSize="mini"
+                app:srcCompat="@android:drawable/ic_input_add" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Główny przycisk FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_main"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Status alarmu"
-        android:paddingTop="8dp"
-        android:paddingBottom="4dp"
-        android:textColor="#FF0000"
-        android:gravity="center"
-        android:textStyle="italic" />
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        app:srcCompat="@android:drawable/ic_dialog_dialer" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Twoje produkty:"
-        android:paddingTop="8dp"
-        android:paddingBottom="4dp"
-        android:textStyle="bold" />
-
-    <ListView
-        android:id="@+id/listViewFoodItems"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

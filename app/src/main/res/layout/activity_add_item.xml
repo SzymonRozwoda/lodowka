@@ -24,4 +24,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Dodaj"/>
+
+    <Button
+        android:id="@+id/buttonCancel"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Anuluj"
+        android:textColor="#757575"/>
 </LinearLayout>

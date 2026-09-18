@@ -11,8 +11,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,15 +23,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     private ArrayList<FoodItem> foodList;
     private ArrayAdapter<FoodItem> adapter;
+    private ListView listView;
     private TextView alarmStatusText;
     private static final String FILE_NAME = "foods.txt";
     private static final int PERMISSION_REQUEST_CODE = 100;
+
+    // Elementy menu FAB
+    private FloatingActionButton fabMain, fabAddItem, fabSettings;
+    private LinearLayout fabMenuContainer;
+    private boolean isMenuOpen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,17 +48,13 @@ public class MainActivity extends AppCompatActivity {
 
         foodList = StorageHelper.loadFoodItems(this, FILE_NAME);
 
-        ListView listView = findViewById(R.id.listViewFoodItems);
+        listView = findViewById(R.id.listViewFoodItems);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, foodList);
         listView.setAdapter(adapter);
 
         alarmStatusText = findViewById(R.id.alarmStatusText);
 
-        Button addButton = findViewById(R.id.addButton);
-        addButton.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, AddItemActivity.class);
-            startActivity(intent);
-        });
+        setupFabMenu();
 
         // Podstawowe sprawdzenie uprawnień i ustawień
         checkPermissions();
@@ -58,6 +63,40 @@ public class MainActivity extends AppCompatActivity {
         // Ustawienie alarmu na 9:00
         AlarmHelper.setDailyAlarm(this);
         updateAlarmStatus();
+    }
+
+    private void setupFabMenu() {
+        fabMain = findViewById(R.id.fab_main);
+        fabAddItem = findViewById(R.id.fab_add_item);
+        fabSettings = findViewById(R.id.fab_settings);
+        fabMenuContainer = findViewById(R.id.fab_menu_container);
+
+        fabMain.setOnClickListener(v -> toggleFabMenu());
+
+        fabAddItem.setOnClickListener(v -> {
+            toggleFabMenu(); // Zamknij menu
+            Intent intent = new Intent(MainActivity.this, AddItemActivity.class);
+            startActivity(intent);
+        });
+
+        fabSettings.setOnClickListener(v -> {
+            toggleFabMenu(); // Zamknij menu
+            Toast.makeText(this, "Ustawienia wkrótce!", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void toggleFabMenu() {
+        if (!isMenuOpen) {
+            // Otwieranie
+            fabMenuContainer.setVisibility(View.VISIBLE);
+            fabMain.animate().rotation(45f).setDuration(200).start();
+            isMenuOpen = true;
+        } else {
+            // Zamykanie
+            fabMenuContainer.setVisibility(View.GONE);
+            fabMain.animate().rotation(0f).setDuration(200).start();
+            isMenuOpen = false;
+        }
     }
 
     private void updateAlarmStatus() {
@@ -84,15 +123,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkBatteryOptimizations() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-            if (pm != null && !pm.isIgnoringBatteryOptimizations(getPackageName())) {
-                Toast.makeText(this, "Wyłącz optymalizację baterii dla powiadomień rano.", Toast.LENGTH_LONG).show();
-                @SuppressLint("BatteryLife")
-                Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-                intent.setData(Uri.parse("package:" + getPackageName()));
-                startActivity(intent);
-            }
+        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+        if (pm != null && !pm.isIgnoringBatteryOptimizations(getPackageName())) {
+            Toast.makeText(this, "Wyłącz optymalizację baterii dla powiadomień rano.", Toast.LENGTH_LONG).show();
+            @SuppressLint("BatteryLife")
+            Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+            intent.setData(Uri.parse("package:" + getPackageName()));
+            startActivity(intent);
         }
     }
 

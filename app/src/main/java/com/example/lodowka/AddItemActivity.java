@@ -27,6 +27,7 @@ public class AddItemActivity extends AppCompatActivity {
         nameInput = findViewById(R.id.editTextName);
         dateInput = findViewById(R.id.editTextExpiryDate);
         Button saveBtn = findViewById(R.id.buttonAdd);
+        Button cancelBtn = findViewById(R.id.buttonCancel);
 
         dateInput.setOnClickListener(v -> {
             int year = expiryCalendar.get(Calendar.YEAR);
@@ -48,5 +49,7 @@ public class AddItemActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        cancelBtn.setOnClickListener(v -> finish());
     }
 }
