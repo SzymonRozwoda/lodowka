@@ -11,7 +11,7 @@ Aplikacja mobilna na system Android, która pomaga zarządzać produktami spoży
 *   **Pełna Personalizacja:** 
     *   Ustawianie własnej godziny powiadomień.
     *   Wybór motywu: Jasny, Ciemny lub zgodny z systemem.
-*   **Niezawodność:** Obsługa automatycznego przywracania powiadomień po zrestartowaniu telefonu.
+*   **Niezawodność:** Obsługa automatycznego przywracania powiadomień po zrestartowaniu telefonu
 
 
 ## Technologie
@@ -19,12 +19,12 @@ Aplikacja mobilna na system Android, która pomaga zarządzać produktami spoży
 *   **Język:** Java
 *   **UI:** Jetpack (RecyclerView, CoordinatorLayout, Material Components 3)
 *   **Pamięć:** SharedPreferences (ustawienia), Pamięć wewnętrzna (produkty)
-*   **System:** AlarmManager (setAlarmClock) dla maksymalnej niezawodności.
+*   **System:** AlarmManager (setAlarmClock)
 
 ## Jak uruchomić projekt?
 
 1.  Sklonuj repozytorium: `git clone https://github.com/SzymonRozwoda/lodowka.git`
 2.  Otwórz folder projektu w **Android Studio**.
 3.  Poczekaj na synchronizację Gradle (projekt używa Gradle Wrapper, więc nie musisz nic doinstalowywać).
-4.  Uruchom aplikację na emulatorze lub fizycznym urządzeniu (wymagane API 26+).
+4.  Uruchom aplikację na emulatorze lub fizycznym urządzeniu (wymagane API 26+)
 
