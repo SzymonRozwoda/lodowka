@@ -3,6 +3,7 @@ package com.example.lodowka;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,55 +13,68 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
     private ArrayList<FoodItem> foodList;
-    private ArrayAdapter<FoodItem> adapter;
-    private ListView listView;
+    private FoodAdapter adapter;
+    private RecyclerView recyclerView;
     private TextView alarmStatusText;
     private static final String FILE_NAME = "foods.txt";
     private static final int PERMISSION_REQUEST_CODE = 100;
 
     // Elementy menu FAB
-    private FloatingActionButton fabMain, fabAddItem, fabSettings;
+    private FloatingActionButton fabMain, fabAddItem, fabSettings, fabSetTime, fabTheme;
     private LinearLayout fabMenuContainer;
     private boolean isMenuOpen = false;
 
+    private static final String PREFS_NAME = "lodowka_prefs";
+    private static final String KEY_THEME = "app_theme";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Inicjalizacja motywu przed super.onCreate
+        applySavedTheme();
+        
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         foodList = StorageHelper.loadFoodItems(this, FILE_NAME);
 
-        listView = findViewById(R.id.listViewFoodItems);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, foodList);
-        listView.setAdapter(adapter);
+        recyclerView = findViewById(R.id.recyclerViewFoodItems);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new FoodAdapter(foodList);
+        recyclerView.setAdapter(adapter);
 
         alarmStatusText = findViewById(R.id.alarmStatusText);
 
         setupFabMenu();
+        setupSwipeToDelete();
 
         // Podstawowe sprawdzenie uprawnień i ustawień
         checkPermissions();
         checkBatteryOptimizations();
 
-        // Ustawienie alarmu na 9:00
+        // Ustawienie alarmu (wczytuje zapisaną godzinę lub domyślną 9:00)
         AlarmHelper.setDailyAlarm(this);
         updateAlarmStatus();
     }
@@ -69,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
         fabMain = findViewById(R.id.fab_main);
         fabAddItem = findViewById(R.id.fab_add_item);
         fabSettings = findViewById(R.id.fab_settings);
+        fabSetTime = findViewById(R.id.fab_set_time);
+        fabTheme = findViewById(R.id.fab_theme);
         fabMenuContainer = findViewById(R.id.fab_menu_container);
 
         fabMain.setOnClickListener(v -> toggleFabMenu());
@@ -83,6 +99,73 @@ public class MainActivity extends AppCompatActivity {
             toggleFabMenu(); // Zamknij menu
             Toast.makeText(this, "Ustawienia wkrótce!", Toast.LENGTH_SHORT).show();
         });
+
+        fabSetTime.setOnClickListener(v -> {
+            toggleFabMenu(); // Zamknij menu
+            showTimePickerDialog();
+        });
+
+        fabTheme.setOnClickListener(v -> {
+            toggleFabMenu(); // Zamknij menu
+            showThemeSelectionDialog();
+        });
+    }
+
+    private void applySavedTheme() {
+        android.content.SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        int themeMode = prefs.getInt(KEY_THEME, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        AppCompatDelegate.setDefaultNightMode(themeMode);
+    }
+
+    private void showThemeSelectionDialog() {
+        String[] themes = {"Jasny", "Ciemny", "Systemowy"};
+        android.content.SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        int currentTheme = prefs.getInt(KEY_THEME, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        
+        int checkedItem = 2; // Systemowy
+        if (currentTheme == AppCompatDelegate.MODE_NIGHT_NO) checkedItem = 0;
+        else if (currentTheme == AppCompatDelegate.MODE_NIGHT_YES) checkedItem = 1;
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Wybierz motyw")
+                .setSingleChoiceItems(themes, checkedItem, (dialog, which) -> {
+                    int mode;
+                    switch (which) {
+                        case 0: mode = AppCompatDelegate.MODE_NIGHT_NO; break;
+                        case 1: mode = AppCompatDelegate.MODE_NIGHT_YES; break;
+                        default: mode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM; break;
+                    }
+                    prefs.edit().putInt(KEY_THEME, mode).apply();
+                    AppCompatDelegate.setDefaultNightMode(mode);
+                    dialog.dismiss();
+                })
+                .show();
+    }
+
+    private void showTimePickerDialog() {
+        Calendar calendar = Calendar.getInstance();
+        int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+        int currentMinute = calendar.get(Calendar.MINUTE);
+
+        // Użycie motywu Holo Light Dialog wymusza klasyczny wygląd "rolek" (spinnerów)
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this, android.R.style.Theme_Holo_Light_Dialog_NoActionBar, (view, hourOfDay, minute) -> {
+            // Zapisanie nowej godziny
+            AlarmHelper.saveAlarmTime(this, hourOfDay, minute);
+            // Ponowne ustawienie alarmu
+            AlarmHelper.setDailyAlarm(this);
+            // Aktualizacja tekstu w menu
+            updateAlarmStatus();
+            
+            String timeFormatted = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute);
+            Toast.makeText(this, "Powiadomienia ustawione na " + timeFormatted, Toast.LENGTH_LONG).show();
+        }, currentHour, currentMinute, true);
+
+        // Dodatkowe ustawienie tła na przezroczyste, aby okno wyglądało estetycznie w starym stylu
+        if (timePickerDialog.getWindow() != null) {
+            timePickerDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        timePickerDialog.show();
     }
 
     private void toggleFabMenu() {
@@ -97,6 +180,30 @@ public class MainActivity extends AppCompatActivity {
             fabMain.animate().rotation(0f).setDuration(200).start();
             isMenuOpen = false;
         }
+    }
+
+    private void setupSwipeToDelete() {
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                FoodItem deletedItem = foodList.get(position);
+                foodList.remove(position);
+                adapter.notifyItemRemoved(position);
+
+                // Zapisanie aktualnego stanu do pliku
+                StorageHelper.saveAllFoodItems(MainActivity.this, foodList, FILE_NAME);
+                Toast.makeText(MainActivity.this, "Usunięto: " + deletedItem.getName(), Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     private void updateAlarmStatus() {

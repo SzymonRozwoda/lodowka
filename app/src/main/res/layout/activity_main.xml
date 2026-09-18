@@ -11,17 +11,6 @@
         android:padding="16dp">
 
         <TextView
-            android:id="@+id/alarmStatusText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingTop="8dp"
-            android:paddingBottom="4dp"
-            android:text="Status alarmu"
-            android:textColor="#FF0000"
-            android:textStyle="italic" />
-
-        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="8dp"
@@ -29,10 +18,12 @@
             android:text="Twoje produkty:"
             android:textStyle="bold" />
 
-        <ListView
-            android:id="@+id/listViewFoodItems"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewFoodItems"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="88dp" />
     </LinearLayout>
 
     <!-- Kontener na wysuwane opcje -->
@@ -47,6 +38,42 @@
         android:orientation="vertical"
         android:visibility="gone">
 
+        <!-- Status powiadomienia -->
+        <TextView
+            android:id="@+id/alarmStatusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="?attr/colorSurfaceContainer"
+            android:padding="4dp"
+            android:elevation="4dp"
+            android:text="Status alarmu"
+            android:textColor="@color/green_primary"
+            android:textStyle="italic" />
+
+        <!-- Opcja Motyw -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Zmień motyw"
+                android:layout_marginEnd="8dp"
+                android:background="?attr/colorSurfaceContainer"
+                android:padding="4dp"
+                android:elevation="4dp"/>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_theme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:fabSize="mini"
+                app:srcCompat="@android:drawable/ic_menu_compass" />
+        </LinearLayout>
+
         <!-- Opcja Ustawienia -->
         <LinearLayout
             android:layout_width="wrap_content"
@@ -58,7 +85,7 @@
                 android:layout_height="wrap_content"
                 android:text="Ustawienia"
                 android:layout_marginEnd="8dp"
-                android:background="@android:color/white"
+                android:background="?attr/colorSurfaceContainer"
                 android:padding="4dp"
                 android:elevation="4dp"/>
             <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -68,6 +95,29 @@
                 android:layout_margin="8dp"
                 app:fabSize="mini"
                 app:srcCompat="@android:drawable/ic_menu_manage" />
+        </LinearLayout>
+
+        <!-- Opcja Godzina Powiadomienia -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ustaw godzinę"
+                android:layout_marginEnd="8dp"
+                android:background="?attr/colorSurfaceContainer"
+                android:padding="4dp"
+                android:elevation="4dp"/>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_set_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:fabSize="mini"
+                app:srcCompat="@android:drawable/ic_lock_idle_alarm" />
         </LinearLayout>
 
         <!-- Opcja Dodaj -->
@@ -81,7 +131,7 @@
                 android:layout_height="wrap_content"
                 android:text="Dodaj produkt"
                 android:layout_marginEnd="8dp"
-                android:background="@android:color/white"
+                android:background="?attr/colorSurfaceContainer"
                 android:padding="4dp"
                 android:elevation="4dp"/>
             <com.google.android.material.floatingactionbutton.FloatingActionButton

@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
 
@@ -13,10 +14,18 @@ import java.util.Locale;
 
 public class AlarmHelper {
 
+    private static final String PREFS_NAME = "lodowka_prefs";
+    private static final String KEY_HOUR = "alarm_hour";
+    private static final String KEY_MINUTE = "alarm_minute";
+
     /**
-     * Ustawia codzienny alarm na godzinę 9:00 rano.
+     * Ustawia codzienny alarm na godzinę zapisaną w ustawieniach (domyślnie 9:00).
      */
     public static void setDailyAlarm(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        int hour = prefs.getInt(KEY_HOUR, 9);
+        int minute = prefs.getInt(KEY_MINUTE, 0);
+
         Intent intent = new Intent(context, NotificationReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
@@ -28,13 +37,13 @@ public class AlarmHelper {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
 
-        // Ustawienie na 9:00 rano
-        calendar.set(Calendar.HOUR_OF_DAY, 9);
-        calendar.set(Calendar.MINUTE, 0);
+        // Ustawienie na wybraną godzinę
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
-        // Jeśli 9:00 już minęła dzisiaj, ustaw na jutro
+        // Jeśli czas już minął dzisiaj, ustaw na jutro
         if (calendar.before(Calendar.getInstance())) {
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
@@ -63,9 +72,13 @@ public class AlarmHelper {
     }
 
     public static String getNextAlarmStatus(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        int hour = prefs.getInt(KEY_HOUR, 9);
+        int minute = prefs.getInt(KEY_MINUTE, 0);
+
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 9);
-        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
@@ -75,5 +88,13 @@ public class AlarmHelper {
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
         return "Następne powiadomienie: " + sdf.format(calendar.getTime());
+    }
+
+    public static void saveAlarmTime(Context context, int hour, int minute) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs.edit()
+                .putInt(KEY_HOUR, hour)
+                .putInt(KEY_MINUTE, minute)
+                .apply();
     }
 }
