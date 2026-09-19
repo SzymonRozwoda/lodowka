@@ -43,8 +43,10 @@ public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 100;
 
     // Elementy menu FAB
-    private FloatingActionButton fabMain, fabAddItem, fabSettings, fabSetTime, fabTheme;
+    private FloatingActionButton fabMain, fabAddItem, fabSettings, fabSetTime, fabTheme, fabToggleNotifications;
+    private TextView textToggleNotifications;
     private LinearLayout fabMenuContainer;
+    private View fabMenuOverlay;
     private boolean isMenuOpen = false;
 
     private static final String PREFS_NAME = "lodowka_prefs";
@@ -85,9 +87,24 @@ public class MainActivity extends AppCompatActivity {
         fabSettings = findViewById(R.id.fab_settings);
         fabSetTime = findViewById(R.id.fab_set_time);
         fabTheme = findViewById(R.id.fab_theme);
+        fabToggleNotifications = findViewById(R.id.fab_toggle_notifications);
+        textToggleNotifications = findViewById(R.id.text_toggle_notifications);
         fabMenuContainer = findViewById(R.id.fab_menu_container);
+        fabMenuOverlay = findViewById(R.id.fab_menu_overlay);
 
         fabMain.setOnClickListener(v -> toggleFabMenu());
+        if (fabMenuOverlay != null) {
+            fabMenuOverlay.setOnClickListener(v -> toggleFabMenu());
+        }
+
+        fabToggleNotifications.setOnClickListener(v -> {
+            boolean isEnabled = AlarmHelper.isNotificationsEnabled(this);
+            AlarmHelper.setNotificationsEnabled(this, !isEnabled);
+            updateAlarmStatus();
+            toggleFabMenu();
+            String msg = !isEnabled ? "Powiadomienia włączone" : "Powiadomienia wyłączone";
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        });
 
         fabAddItem.setOnClickListener(v -> {
             toggleFabMenu(); // Zamknij menu
@@ -172,11 +189,13 @@ public class MainActivity extends AppCompatActivity {
         if (!isMenuOpen) {
             // Otwieranie
             fabMenuContainer.setVisibility(View.VISIBLE);
+            if (fabMenuOverlay != null) fabMenuOverlay.setVisibility(View.VISIBLE);
             fabMain.animate().rotation(45f).setDuration(200).start();
             isMenuOpen = true;
         } else {
             // Zamykanie
             fabMenuContainer.setVisibility(View.GONE);
+            if (fabMenuOverlay != null) fabMenuOverlay.setVisibility(View.GONE);
             fabMain.animate().rotation(0f).setDuration(200).start();
             isMenuOpen = false;
         }
@@ -209,6 +228,15 @@ public class MainActivity extends AppCompatActivity {
     private void updateAlarmStatus() {
         if (alarmStatusText != null) {
             alarmStatusText.setText(AlarmHelper.getNextAlarmStatus(this));
+        }
+        if (textToggleNotifications != null) {
+            boolean isEnabled = AlarmHelper.isNotificationsEnabled(this);
+            textToggleNotifications.setText(isEnabled ? "Wyłącz powiadomienia" : "Włącz powiadomienia");
+            
+            // Note: ic_lock_silent_mode_off might not exist on all versions, using standard ones
+            fabToggleNotifications.setImageResource(isEnabled ? 
+                    android.R.drawable.ic_lock_silent_mode : 
+                    android.R.drawable.ic_lock_silent_mode_off);
         }
     }
 

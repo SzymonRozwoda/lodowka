@@ -10,6 +10,11 @@ import java.util.ArrayList;
 public class NotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (!AlarmHelper.isNotificationsEnabled(context)) {
+            Log.d("NotificationReceiver", "Powiadomienia są wyłączone, ignoruję alarm.");
+            return;
+        }
+        
         Log.d("NotificationReceiver", "!!! ALARM ODEBRANY !!! - Godzina: " + new java.util.Date());
         ArrayList<FoodItem> foodList = StorageHelper.loadFoodItems(context, "foods.txt");
         Log.d("NotificationReceiver", "Załadowano " + foodList.size() + " produktów.");

@@ -17,11 +17,17 @@ public class AlarmHelper {
     private static final String PREFS_NAME = "lodowka_prefs";
     private static final String KEY_HOUR = "alarm_hour";
     private static final String KEY_MINUTE = "alarm_minute";
+    private static final String KEY_NOTIFICATIONS_ENABLED = "notifications_enabled";
 
     /**
      * Ustawia codzienny alarm na godzinę zapisaną w ustawieniach (domyślnie 9:00).
      */
     public static void setDailyAlarm(Context context) {
+        if (!isNotificationsEnabled(context)) {
+            cancelAlarm(context);
+            return;
+        }
+
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         int hour = prefs.getInt(KEY_HOUR, 9);
         int minute = prefs.getInt(KEY_MINUTE, 0);
@@ -72,6 +78,10 @@ public class AlarmHelper {
     }
 
     public static String getNextAlarmStatus(Context context) {
+        if (!isNotificationsEnabled(context)) {
+            return "Powiadomienia: WYŁĄCZONE";
+        }
+
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         int hour = prefs.getInt(KEY_HOUR, 9);
         int minute = prefs.getInt(KEY_MINUTE, 0);
@@ -96,5 +106,35 @@ public class AlarmHelper {
                 .putInt(KEY_HOUR, hour)
                 .putInt(KEY_MINUTE, minute)
                 .apply();
+    }
+
+    public static boolean isNotificationsEnabled(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        return prefs.getBoolean(KEY_NOTIFICATIONS_ENABLED, true);
+    }
+
+    public static void setNotificationsEnabled(Context context, boolean enabled) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs.edit().putBoolean(KEY_NOTIFICATIONS_ENABLED, enabled).apply();
+        if (enabled) {
+            setDailyAlarm(context);
+        } else {
+            cancelAlarm(context);
+        }
+    }
+
+    public static void cancelAlarm(Context context) {
+        Intent intent = new Intent(context, NotificationReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager != null) {
+            alarmManager.cancel(pendingIntent);
+            Log.d("AlarmHelper", "Alarm anulowany.");
+        }
     }
 }
