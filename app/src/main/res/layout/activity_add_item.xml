@@ -19,6 +19,13 @@
         android:focusable="false"
         android:hint="Data ważności (dd/MM/yyyy)"/>
 
+    <EditText
+        android:id="@+id/editTextReminderDays"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="Przypomnij ile dni przed (domyślnie 3)"/>
+
     <Button
         android:id="@+id/buttonAdd"
         android:layout_width="match_parent"

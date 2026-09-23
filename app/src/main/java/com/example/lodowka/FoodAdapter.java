@@ -6,10 +6,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Locale;
 
 public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder> {
@@ -32,7 +34,32 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
     public void onBindViewHolder(@NonNull FoodViewHolder holder, int position) {
         FoodItem item = foodList.get(position);
         holder.nameText.setText(item.getName());
-        holder.dateText.setText("Data ważności: " + sdf.format(item.getExpiryDate().getTime()));
+        holder.dateText.setText("Data ważności: " + sdf.format(item.getExpiryDate().getTime())
+                + " (przypomnij " + item.getReminderDaysBefore() + " dni przed)");
+
+        // Obliczanie dni do końca ważności
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+
+        Calendar expiry = (Calendar) item.getExpiryDate().clone();
+        expiry.set(Calendar.HOUR_OF_DAY, 0);
+        expiry.set(Calendar.MINUTE, 0);
+        expiry.set(Calendar.SECOND, 0);
+        expiry.set(Calendar.MILLISECOND, 0);
+
+        long diffDays = (expiry.getTimeInMillis() - today.getTimeInMillis()) / (1000 * 60 * 60 * 24);
+
+        if (diffDays <= item.getReminderDaysBefore()) {
+            int redColor = ContextCompat.getColor(holder.itemView.getContext(), android.R.color.holo_red_dark);
+            holder.nameText.setTextColor(redColor);
+            holder.dateText.setTextColor(redColor);
+        } else {
+            holder.nameText.setTextColor(holder.defaultNameColor);
+            holder.dateText.setTextColor(holder.defaultDateColor);
+        }
     }
 
     @Override
@@ -48,11 +75,15 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
     public static class FoodViewHolder extends RecyclerView.ViewHolder {
         TextView nameText;
         TextView dateText;
+        int defaultNameColor;
+        int defaultDateColor;
 
         public FoodViewHolder(@NonNull View itemView) {
             super(itemView);
             nameText = itemView.findViewById(R.id.textViewFoodName);
             dateText = itemView.findViewById(R.id.textViewExpiryDate);
+            defaultNameColor = nameText.getCurrentTextColor();
+            defaultDateColor = dateText.getCurrentTextColor();
         }
     }
 }
