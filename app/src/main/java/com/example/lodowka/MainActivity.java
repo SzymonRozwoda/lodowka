@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<FoodItem> foodList;
     private FoodAdapter adapter;
     private RecyclerView recyclerView;
-    private static final String FILE_NAME = "foods.txt";
     private static final int PERMISSION_REQUEST_CODE = 100;
 
     // Elementy menu FAB
@@ -60,12 +59,21 @@ public class MainActivity extends AppCompatActivity {
 
         displayCurrentDate();
 
-        foodList = StorageHelper.loadFoodItems(this, FILE_NAME);
+        foodList = new ArrayList<>();
 
         recyclerView = findViewById(R.id.recyclerViewFoodItems);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new FoodAdapter(foodList);
         recyclerView.setAdapter(adapter);
+
+        StorageHelper.migrateLegacyDataIfNeeded(this);
+        AppDatabase.getInstance(this).foodDao().getAllFoodItemsLiveData().observe(this, items -> {
+            foodList.clear();
+            if (items != null) {
+                foodList.addAll(items);
+            }
+            adapter.notifyDataSetChanged();
+        });
 
         setupFabMenu();
         setupSwipeToDelete();
@@ -142,10 +150,7 @@ public class MainActivity extends AppCompatActivity {
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
                 FoodItem deletedItem = foodList.get(position);
-                foodList.remove(position);
-                adapter.notifyItemRemoved(position);
-
-                StorageHelper.saveAllFoodItems(MainActivity.this, foodList, FILE_NAME);
+                StorageHelper.deleteFoodItem(MainActivity.this, deletedItem);
                 Toast.makeText(MainActivity.this, "Usunięto: " + deletedItem.getName(), Toast.LENGTH_SHORT).show();
             }
         };
@@ -193,8 +198,5 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        foodList.clear();
-        foodList.addAll(StorageHelper.loadFoodItems(this, FILE_NAME));
-        adapter.notifyDataSetChanged();
     }
 }

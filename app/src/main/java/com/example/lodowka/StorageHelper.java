@@ -2,35 +2,32 @@ package com.example.lodowka;
 
 import android.content.Context;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 
 public class StorageHelper {
 
-    public static void saveFoodItem(Context context, FoodItem item, String filename) {
-        try (FileOutputStream fos = context.openFileOutput(filename, Context.MODE_APPEND);
-             OutputStreamWriter writer = new OutputStreamWriter(fos)) {
-            writer.write(item.getName() + ";" + item.getExpiryDate().getTimeInMillis() + ";" + item.getReminderDaysBefore() + "\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    private static boolean isMigrated = false;
 
-    public static void saveAllFoodItems(Context context, ArrayList<FoodItem> items, String filename) {
-        try (FileOutputStream fos = context.openFileOutput(filename, Context.MODE_PRIVATE);
-             OutputStreamWriter writer = new OutputStreamWriter(fos)) {
-            for (FoodItem item : items) {
-                writer.write(item.getName() + ";" + item.getExpiryDate().getTimeInMillis() + ";" + item.getReminderDaysBefore() + "\n");
+    public static synchronized void migrateLegacyDataIfNeeded(Context context) {
+        if (isMigrated) return;
+        File legacyFile = new File(context.getFilesDir(), "foods.txt");
+        if (legacyFile.exists()) {
+            ArrayList<FoodItem> legacyItems = loadFoodItemsFromTextFile(context, "foods.txt");
+            if (!legacyItems.isEmpty()) {
+                AppDatabase.getInstance(context).foodDao().insertAll(legacyItems);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            legacyFile.delete();
         }
+        isMigrated = true;
     }
 
-    public static ArrayList<FoodItem> loadFoodItems(Context context, String filename) {
+    private static ArrayList<FoodItem> loadFoodItemsFromTextFile(Context context, String filename) {
         ArrayList<FoodItem> items = new ArrayList<>();
         try (FileInputStream fis = context.openFileInput(filename);
              Scanner scanner = new Scanner(fis)) {
@@ -54,10 +51,35 @@ public class StorageHelper {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // Sortowanie po dacie ważności rosnąco (najbardziej przeterminowane / najbliższe końca na początku)
-        Collections.sort(items, (item1, item2) -> item1.getExpiryDate().compareTo(item2.getExpiryDate()));
-
         return items;
+    }
+
+    public static void saveFoodItem(Context context, FoodItem item, String filename) {
+        migrateLegacyDataIfNeeded(context);
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            AppDatabase.getInstance(context).foodDao().insert(item);
+        });
+    }
+
+    public static void saveAllFoodItems(Context context, ArrayList<FoodItem> items, String filename) {
+        migrateLegacyDataIfNeeded(context);
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            FoodDao dao = AppDatabase.getInstance(context).foodDao();
+            dao.deleteAll();
+            dao.insertAll(items);
+        });
+    }
+
+    public static void deleteFoodItem(Context context, FoodItem item) {
+        migrateLegacyDataIfNeeded(context);
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            AppDatabase.getInstance(context).foodDao().delete(item);
+        });
+    }
+
+    public static ArrayList<FoodItem> loadFoodItems(Context context, String filename) {
+        migrateLegacyDataIfNeeded(context);
+        List<FoodItem> list = AppDatabase.getInstance(context).foodDao().getAllFoodItemsSync();
+        return new ArrayList<>(list);
     }
 }

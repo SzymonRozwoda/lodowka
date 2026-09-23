@@ -36,7 +36,24 @@ public class NotificationHelper {
 
             long diffDays = (expiry.getTimeInMillis() - today.getTimeInMillis()) / (1000 * 60 * 60 * 24);
             if (diffDays <= item.getReminderDaysBefore()) {
+                String daysText;
+                if (diffDays > 1) {
+                    daysText = diffDays + " dni do terminu";
+                } else if (diffDays == 1) {
+                    daysText = "1 dzień do terminu";
+                } else if (diffDays == 0) {
+                    daysText = "dzisiaj mija termin!";
+                } else {
+                    long overdue = Math.abs(diffDays);
+                    if (overdue == 1) {
+                        daysText = "przeterminowane o 1 dzień!";
+                    } else {
+                        daysText = "przeterminowane o " + overdue + " dni!";
+                    }
+                }
+
                 message.append("- ").append(item.getName())
+                        .append(" ").append(daysText)
                         .append(" (").append(sdf.format(item.getExpiryDate().getTime())).append(")\n");
             }
         }
