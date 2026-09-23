@@ -5,6 +5,7 @@ import android.content.Context;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Scanner;
 
 public class StorageHelper {
@@ -12,7 +13,7 @@ public class StorageHelper {
     public static void saveFoodItem(Context context, FoodItem item, String filename) {
         try (FileOutputStream fos = context.openFileOutput(filename, Context.MODE_APPEND);
              OutputStreamWriter writer = new OutputStreamWriter(fos)) {
-            writer.write(item.getName() + ";" + item.getExpiryDate().getTimeInMillis() + "\n");
+            writer.write(item.getName() + ";" + item.getExpiryDate().getTimeInMillis() + ";" + item.getReminderDaysBefore() + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -22,7 +23,7 @@ public class StorageHelper {
         try (FileOutputStream fos = context.openFileOutput(filename, Context.MODE_PRIVATE);
              OutputStreamWriter writer = new OutputStreamWriter(fos)) {
             for (FoodItem item : items) {
-                writer.write(item.getName() + ";" + item.getExpiryDate().getTimeInMillis() + "\n");
+                writer.write(item.getName() + ";" + item.getExpiryDate().getTimeInMillis() + ";" + item.getReminderDaysBefore() + "\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -35,16 +36,28 @@ public class StorageHelper {
              Scanner scanner = new Scanner(fis)) {
             while (scanner.hasNextLine()) {
                 String[] parts = scanner.nextLine().split(";");
-                if (parts.length == 2) {
+                if (parts.length >= 2) {
                     String name = parts[0];
                     Calendar date = Calendar.getInstance();
                     date.setTimeInMillis(Long.parseLong(parts[1]));
-                    items.add(new FoodItem(name, date));
+                    int reminderDays = 3;
+                    if (parts.length >= 3) {
+                        try {
+                            reminderDays = Integer.parseInt(parts[2]);
+                        } catch (NumberFormatException e) {
+                            reminderDays = 3;
+                        }
+                    }
+                    items.add(new FoodItem(name, date, reminderDays));
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        // Sortowanie po dacie ważności rosnąco (najbardziej przeterminowane / najbliższe końca na początku)
+        Collections.sort(items, (item1, item2) -> item1.getExpiryDate().compareTo(item2.getExpiryDate()));
+
         return items;
     }
 }

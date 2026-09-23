@@ -18,6 +18,7 @@ public class AlarmHelper {
     private static final String KEY_HOUR = "alarm_hour";
     private static final String KEY_MINUTE = "alarm_minute";
     private static final String KEY_NOTIFICATIONS_ENABLED = "notifications_enabled";
+    private static final String KEY_ONLY_NEAR_EXPIRY = "only_near_expiry";
 
     /**
      * Ustawia codzienny alarm na godzinę zapisaną w ustawieniach (domyślnie 9:00).
@@ -121,6 +122,16 @@ public class AlarmHelper {
         } else {
             cancelAlarm(context);
         }
+    }
+
+    public static boolean isOnlyNearExpiryEnabled(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        return prefs.getBoolean(KEY_ONLY_NEAR_EXPIRY, false);
+    }
+
+    public static void setOnlyNearExpiryEnabled(Context context, boolean enabled) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs.edit().putBoolean(KEY_ONLY_NEAR_EXPIRY, enabled).apply();
     }
 
     public static void cancelAlarm(Context context) {

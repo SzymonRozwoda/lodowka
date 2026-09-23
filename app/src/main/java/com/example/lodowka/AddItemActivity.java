@@ -16,6 +16,7 @@ public class AddItemActivity extends AppCompatActivity {
 
     private EditText nameInput;
     private EditText dateInput;
+    private EditText reminderDaysInput;
     private Calendar expiryCalendar = Calendar.getInstance();
     private static final String FILE_NAME = "foods.txt";
 
@@ -26,6 +27,7 @@ public class AddItemActivity extends AppCompatActivity {
 
         nameInput = findViewById(R.id.editTextName);
         dateInput = findViewById(R.id.editTextExpiryDate);
+        reminderDaysInput = findViewById(R.id.editTextReminderDays);
         Button saveBtn = findViewById(R.id.buttonAdd);
         Button cancelBtn = findViewById(R.id.buttonCancel);
 
@@ -44,7 +46,16 @@ public class AddItemActivity extends AppCompatActivity {
         saveBtn.setOnClickListener(v -> {
             String name = nameInput.getText().toString();
             if (!name.isEmpty()) {
-                FoodItem item = new FoodItem(name, (Calendar) expiryCalendar.clone());
+                int reminderDays = 3;
+                String reminderStr = reminderDaysInput.getText().toString().trim();
+                if (!reminderStr.isEmpty()) {
+                    try {
+                        reminderDays = Integer.parseInt(reminderStr);
+                    } catch (NumberFormatException e) {
+                        reminderDays = 3;
+                    }
+                }
+                FoodItem item = new FoodItem(name, (Calendar) expiryCalendar.clone(), reminderDays);
                 StorageHelper.saveFoodItem(this, item, FILE_NAME);
                 finish();
             }

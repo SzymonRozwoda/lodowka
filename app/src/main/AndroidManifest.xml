@@ -28,6 +28,10 @@
         <activity
             android:name=".AddItemActivity"
             android:exported="false" />
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:label="Ustawienia" />
         <receiver
             android:name=".NotificationReceiver"
             android:exported="true"

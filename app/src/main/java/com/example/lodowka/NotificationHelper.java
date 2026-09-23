@@ -21,21 +21,34 @@ public class NotificationHelper {
     public static void sendDailyNotification(Context context, ArrayList<FoodItem> foodList) {
         StringBuilder message = new StringBuilder();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        Calendar now = Calendar.getInstance();
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
 
         for (FoodItem item : foodList) {
-            long diff = (item.getExpiryDate().getTimeInMillis() - now.getTimeInMillis()) / (1000 * 60 * 60 * 24);
-            if (diff <= 3) {
+            Calendar expiry = (Calendar) item.getExpiryDate().clone();
+            expiry.set(Calendar.HOUR_OF_DAY, 0);
+            expiry.set(Calendar.MINUTE, 0);
+            expiry.set(Calendar.SECOND, 0);
+            expiry.set(Calendar.MILLISECOND, 0);
+
+            long diffDays = (expiry.getTimeInMillis() - today.getTimeInMillis()) / (1000 * 60 * 60 * 24);
+            if (diffDays <= item.getReminderDaysBefore()) {
                 message.append("- ").append(item.getName())
                         .append(" (").append(sdf.format(item.getExpiryDate().getTime())).append(")\n");
             }
         }
 
-        String finalMessage = message.length() > 0
-                ? "Produkty z krótkim terminem ważności:\n" + message
-                : "Brak produktów z terminem ważności za 3 dni lub mniej.";
-
-        showNotification(context, "Przypomnienie z lodówki", finalMessage);
+        if (message.length() == 0) {
+            if (AlarmHelper.isOnlyNearExpiryEnabled(context)) {
+                return; // Użytkownik chce powiadomienia tylko gdy produkty są blisko terminu
+            }
+            showNotification(context, "Przypomnienie z lodówki", "Brak produktów z kończącym się terminem ważności.");
+        } else {
+            showNotification(context, "Przypomnienie z lodówki", "Produkty z krótkim terminem ważności:\n" + message);
+        }
     }
 
     private static void showNotification(Context context, String title, String message) {
