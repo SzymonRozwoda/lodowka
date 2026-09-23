@@ -6,7 +6,7 @@ Wszystkie istotne zmiany w projekcie będą dokumentowane w tym pliku.
 
 ## [1.1] — 2025-04-15
 
-### 🚀 Nowe funkcje i ulepszenia
+### Nowe funkcje i ulepszenia
 - **Przejście na bazę danych Jetpack Room (SQLite):**
   - Zamiana pliku tekstowego `foods.txt` na strukturę bazy danych SQLite z interfejsem Room (`AppDatabase`, `FoodDao`, `FoodItem`).
   - Automatyczna i bezpieczna migracja istniejących danych z pliku tekstowego bez ryzyka ich utraty.
@@ -25,7 +25,7 @@ Wszystkie istotne zmiany w projekcie będą dokumentowane w tym pliku.
 
 ## [1.0] — Wersja początkowa (Initial Release)
 
-### 📌 Podstawowe funkcje
+### Podstawowe funkcje
 - **Zarządzanie produktami:**
   - Dodawanie produktów z nazwą i wyborem daty ważności z kalendarza (`DatePickerDialog`).
   - Wyświetlanie listy produktów w interfejsie `RecyclerView`.
@@ -39,5 +39,5 @@ Wszystkie istotne zmiany w projekcie będą dokumentowane w tym pliku.
   - Wybór godziny wysyłania codziennego przypomnienia.
   - Wybór motywu interfejsu (Jasny, Ciemny, Systemowy).
 - **Przechowywanie danych:**
-  - Zapis produktów w lokalnym pliku pliku tekstowym (`foods.txt`).
+  - Zapis produktów w lokalnym pliku tekstowym (`foods.txt`).
   - Zapis ustawień użytkownika w `SharedPreferences`.
