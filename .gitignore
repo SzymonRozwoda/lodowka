@@ -1,8 +1,16 @@
 # Build artifacts
 **/build/
+**/release/
 *.apk
+*.aab
 *.aar
 *.jks
+*.keystore
+*.pepk
+
+# Room schemas
+/app/schemas/
+/schemas/
 
 # Android Studio / IntelliJ
 .idea/
