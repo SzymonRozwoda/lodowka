@@ -1,11 +1,13 @@
 package com.example.lodowka;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -53,10 +55,14 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         long diffDays = (expiry.getTimeInMillis() - today.getTimeInMillis()) / (1000 * 60 * 60 * 24);
 
         if (diffDays <= item.getReminderDaysBefore()) {
-            int redColor = ContextCompat.getColor(holder.itemView.getContext(), android.R.color.holo_red_dark);
-            holder.nameText.setTextColor(redColor);
-            holder.dateText.setTextColor(redColor);
+            // Tymczasowo: czerwone tło karty oraz biały tekst dla wysoki kontrastu
+            int redBg = ContextCompat.getColor(holder.itemView.getContext(), android.R.color.holo_red_light);
+            holder.cardView.setCardBackgroundColor(redBg);
+            holder.nameText.setTextColor(Color.WHITE);
+            holder.dateText.setTextColor(Color.WHITE);
         } else {
+            // Przywróć domyślne kolory
+            holder.cardView.setCardBackgroundColor(holder.defaultCardBgColor);
             holder.nameText.setTextColor(holder.defaultNameColor);
             holder.dateText.setTextColor(holder.defaultDateColor);
         }
@@ -73,17 +79,21 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
     }
 
     public static class FoodViewHolder extends RecyclerView.ViewHolder {
+        CardView cardView;
         TextView nameText;
         TextView dateText;
         int defaultNameColor;
         int defaultDateColor;
+        int defaultCardBgColor;
 
         public FoodViewHolder(@NonNull View itemView) {
             super(itemView);
+            cardView = (CardView) itemView;
             nameText = itemView.findViewById(R.id.textViewFoodName);
             dateText = itemView.findViewById(R.id.textViewExpiryDate);
             defaultNameColor = nameText.getCurrentTextColor();
             defaultDateColor = dateText.getCurrentTextColor();
+            defaultCardBgColor = cardView.getCardBackgroundColor().getDefaultColor();
         }
     }
 }

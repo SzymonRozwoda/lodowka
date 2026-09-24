@@ -15,7 +15,7 @@ Wszystkie istotne zmiany w projekcie będą dokumentowane w tym pliku.
   - Możliwość ustawienia indywidualnej liczby dni przypomnienia przed końcem ważności dla każdego produktu (domyślnie 3 dni).
   - Dynamiczne i czytelne formatowanie powiadomień (np. `- Mleko 2 dni do terminu (16/04/2025)` lub `- Jogurt dzisiaj mija termin!`).
 - **Ulepszenia wizualne UI:**
-  - Podświetlanie nazwy i daty na **czerwono** dla produktów, które wygasły lub kwalifikują się do przypomnienia.
+  - Czerwone tło tarczy karty dla produktów, które wygasły lub kwalifikują się do przypomnienia.
   - Automatyczne sortowanie produktów rosnąco według daty ważności (najbardziej przeterminowane na samej górze).
   - Dodano wyświetlanie dzisiejszej daty w prawym górnym rogu ekranu głównego.
 - **Ustawienia powiadomień:**
